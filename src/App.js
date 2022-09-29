@@ -2,21 +2,46 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 
 function App() {
-  const [planetName, setPlanetName] = useState('');
   const [planets, setPlanets] = useState([]);
+  const [planetName, setPlanetName] = useState('');
+  const [selected, setSelected] = useState({
+    column: 'population',
+    operator: 'maior que',
+    number: 0,
+  });
+  const [hasFilters, setHasFilters] = useState(false);
+  const [selectedFilters, setSelectedFilters] = useState([]);
 
   useEffect(() => {
     const getPlanets = async () => {
       const response = await fetch('https://swapi-trybe.herokuapp.com/api/planets');
       const result = await response.json();
       console.log(result);
-      const planetsResult = result.results;
+      const planetsResult = result.results.filter(
+        (planet) => planet.name.toLowerCase().includes(planetName.toLowerCase()),
+      );
       setPlanets(planetsResult);
       console.log(planetsResult);
     };
 
     getPlanets();
-  }, []);
+  }, [planetName, hasFilters]);
+
+  const runFilters = (planet, column, operator, number) => {
+    if (operator === 'maior que') {
+      console.log('maior que');
+      return Number(planet[column]) > Number(number);
+    }
+    if (operator === 'menor que') {
+      console.log('menor que');
+      return Number(planet[column]) < Number(number);
+    }
+    if (operator === 'igual a') {
+      console.log('igual a');
+      return Number(planet[column]) === Number(number);
+    }
+    return true;
+  };
 
   return (
     <>
@@ -29,6 +54,71 @@ function App() {
           onChange={ ({ target }) => setPlanetName(target.value) }
         />
       </div>
+
+      <form>
+        <select
+          data-testid="column-filter"
+          value={ selected.column }
+          onChange={ ({ target }) => setSelected(
+            (prevState) => ({ ...prevState, column: target.value }),
+          ) }
+        >
+          <option value="population">population</option>
+          <option value="orbital_period">orbital_period</option>
+          <option value="diameter">diameter</option>
+          <option value="rotation_period">rotation_period</option>
+          <option value="surface_water">surface_water</option>
+        </select>
+        <select
+          data-testid="comparison-filter"
+          value={ selected.operator }
+          onChange={ ({ target }) => setSelected(
+            (prevState) => ({ ...prevState, operator: target.value }),
+          ) }
+        >
+          <option value="maior que">maior que</option>
+          <option value="menor que">menor que</option>
+          <option value="igual a">igual a</option>
+        </select>
+        <input
+          type="number"
+          data-testid="value-filter"
+          value={ selected.number }
+          onChange={ ({ target }) => setSelected(
+            (prevState) => ({ ...prevState, number: target.value }),
+          ) }
+        />
+        <button
+          type="button"
+          data-testid="button-filter"
+          onClick={ () => {
+            setHasFilters(true);
+            setSelectedFilters(
+              (prevState) => ([...prevState, selected]),
+            );
+            setSelected({
+              column: selected.column,
+              operator: selected.operator,
+              number: selected.number,
+            });
+          } }
+        >
+          FILTRAR
+        </button>
+      </form>
+
+      <div>
+        {selectedFilters.map((filter, index) => (
+          <p key={ index }>
+            {filter.column}
+            {' '}
+            {filter.operator}
+            {' '}
+            {filter.number}
+          </p>
+        ))}
+      </div>
+
       <table>
         <thead>
           <tr>
@@ -49,9 +139,9 @@ function App() {
         </thead>
         <tbody>
           {planets
-            .filter(
-              (planet) => planet.name.toLowerCase().includes(planetName.toLowerCase()),
-            )
+            .filter((planet) => (hasFilters ? runFilters(
+              planet, selected.column, selected.operator, selected.number,
+            ) : true))
             .map((planet) => (
               <tr
                 key={ planet.name }
