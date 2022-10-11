@@ -25,28 +25,38 @@ function App() {
     };
 
     getPlanets();
-  }, [planetName, hasFilters]);
+    console.log(selectedFilters);
+  }, [planetName, hasFilters, selectedFilters]);
 
-  const runFilters = (planet, column, operator, number) => {
-    if (operator === 'maior que') {
-      console.log('maior que');
-      return Number(planet[column]) > Number(number);
-    }
-    if (operator === 'menor que') {
-      console.log('menor que');
-      return Number(planet[column]) < Number(number);
-    }
-    if (operator === 'igual a') {
-      console.log('igual a');
-      return Number(planet[column]) === Number(number);
-    }
-    return true;
+  const runFilters = (planet, filters) => {
+    const bools = [];
+    filters.forEach((filter) => {
+      const { column, operator, number } = filter;
+      console.log(column, operator, number);
+      if (operator === 'maior que') {
+        console.log('maior que');
+        bools.push(Number(planet[column]) > Number(number));
+        return;
+      }
+      if (operator === 'menor que') {
+        console.log('menor que');
+        bools.push(Number(planet[column]) < Number(number));
+        return;
+      }
+      if (operator === 'igual a') {
+        console.log('igual a');
+        bools.push(Number(planet[column]) === Number(number));
+        return;
+      }
+      return true;
+    });
+    return bools.every((el) => el);
   };
 
   return (
     <>
       <div>
-        <h1>Projeto Star Wars - Trybe!</h1>
+        <h1>Projeto Star Wars - Trybe</h1>
         <input
           type="text"
           data-testid="name-filter"
@@ -140,7 +150,7 @@ function App() {
         <tbody>
           {planets
             .filter((planet) => (hasFilters ? runFilters(
-              planet, selected.column, selected.operator, selected.number,
+              planet, selectedFilters,
             ) : true))
             .map((planet) => (
               <tr
