@@ -12,6 +12,20 @@ function App() {
   const [hasFilters, setHasFilters] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState([]);
 
+  const [columnsOptions, setColumnsOptions] = useState([
+    'population',
+    'orbital_period',
+    'diameter',
+    'rotation_period',
+    'surface_water',
+  ]);
+
+  const [comparisonsOptions, setComparisonsOptions] = useState([
+    'maior que',
+    'menor que',
+    'igual a',
+  ]);
+
   useEffect(() => {
     const getPlanets = async () => {
       const response = await fetch('https://swapi-trybe.herokuapp.com/api/planets/');
@@ -66,11 +80,9 @@ function App() {
             (prevState) => ({ ...prevState, column: target.value }),
           ) }
         >
-          <option value="population">population</option>
-          <option value="orbital_period">orbital_period</option>
-          <option value="diameter">diameter</option>
-          <option value="rotation_period">rotation_period</option>
-          <option value="surface_water">surface_water</option>
+          {columnsOptions.map((column) => (
+            <option key={ column } value={ column }>{ column }</option>
+          ))}
         </select>
         <select
           data-testid="comparison-filter"
@@ -78,16 +90,13 @@ function App() {
             (prevState) => ({ ...prevState, operator: target.value }),
           ) }
         >
-          <option value="maior que">maior que</option>
-          <option value="menor que">menor que</option>
-          <option value="igual a">igual a</option>
+          {comparisonsOptions.map((comparison) => (
+            <option key={ comparison } value={ comparison }>{ comparison }</option>
+          ))}
         </select>
         <input
           type="number"
           value={ selected.number }
-          // value={ hasFilters
-          //   ? selectedFilters[selectedFilters.length - 1].number
-          //   : selected.number }
           data-testid="value-filter"
           onChange={ ({ target }) => setSelected(
             (prevState) => ({ ...prevState, number: target.value }),
@@ -101,12 +110,20 @@ function App() {
             setSelectedFilters(
               (prevState) => ([...prevState, selected]),
             );
+            const newsColumnsOptions = columnsOptions.filter(
+              (column) => column !== selected.column,
+            );
+            setColumnsOptions(newsColumnsOptions);
+            const newComparisonsOptions = comparisonsOptions.filter(
+              (comparison) => comparison !== selected.operator,
+            );
+            setComparisonsOptions(newComparisonsOptions);
             setSelected({
-              column: selected.column,
-              operator: selected.operator,
+              column: newsColumnsOptions[0],
+              operator: newComparisonsOptions[0],
               number: selected.number,
             });
-            // console.log('clicou btn');
+            // console.log('clicou btn', selected);
           } }
         >
           FILTRAR
