@@ -14,41 +14,35 @@ function App() {
 
   useEffect(() => {
     const getPlanets = async () => {
-      const response = await fetch('https://swapi-trybe.herokuapp.com/api/planets');
+      const response = await fetch('https://swapi-trybe.herokuapp.com/api/planets/');
       const result = await response.json();
-      console.log(result);
+      // console.log(result);
       const planetsResult = result.results.filter(
         (planet) => planet.name.toLowerCase().includes(planetName.toLowerCase()),
       );
       setPlanets(planetsResult);
-      console.log(planetsResult);
     };
 
     getPlanets();
-    console.log(selectedFilters);
+    // console.log(selectedFilters);
   }, [planetName, hasFilters, selectedFilters]);
 
   const runFilters = (planet, filters) => {
     const bools = [];
+    // console.log(filters);
     filters.forEach((filter) => {
       const { column, operator, number } = filter;
-      console.log(column, operator, number);
+      // console.log({ column, operator, number });
       if (operator === 'maior que') {
-        console.log('maior que');
         bools.push(Number(planet[column]) > Number(number));
         return;
       }
       if (operator === 'menor que') {
-        console.log('menor que');
         bools.push(Number(planet[column]) < Number(number));
         return;
       }
-      if (operator === 'igual a') {
-        console.log('igual a');
-        bools.push(Number(planet[column]) === Number(number));
-        return;
-      }
-      return true;
+      bools.push(Number(planet[column]) === Number(number));
+      return null;
     });
     return bools.every((el) => el);
   };
@@ -68,7 +62,6 @@ function App() {
       <form>
         <select
           data-testid="column-filter"
-          value={ selected.column }
           onChange={ ({ target }) => setSelected(
             (prevState) => ({ ...prevState, column: target.value }),
           ) }
@@ -81,7 +74,6 @@ function App() {
         </select>
         <select
           data-testid="comparison-filter"
-          value={ selected.operator }
           onChange={ ({ target }) => setSelected(
             (prevState) => ({ ...prevState, operator: target.value }),
           ) }
@@ -92,8 +84,11 @@ function App() {
         </select>
         <input
           type="number"
-          data-testid="value-filter"
           value={ selected.number }
+          // value={ hasFilters
+          //   ? selectedFilters[selectedFilters.length - 1].number
+          //   : selected.number }
+          data-testid="value-filter"
           onChange={ ({ target }) => setSelected(
             (prevState) => ({ ...prevState, number: target.value }),
           ) }
@@ -111,6 +106,7 @@ function App() {
               operator: selected.operator,
               number: selected.number,
             });
+            // console.log('clicou btn');
           } }
         >
           FILTRAR
@@ -155,6 +151,7 @@ function App() {
             .map((planet) => (
               <tr
                 key={ planet.name }
+                data-testid="row-table"
               >
                 <td>
                   { planet.name }
