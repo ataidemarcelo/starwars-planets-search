@@ -125,4 +125,24 @@ describe('App Component', () => {
       // const rows = screen.getAllByTestId('row-table');
       // expect(rows.length).toBe(3);
   });
+
+  test('Verifica os button de Remover Filtros', async () => {
+    await waitFor(() => render(<App />));
+
+    const removeFilters = screen.getByTestId('button-remove-filters');
+
+    userEvent.click(removeFilters);
+  });
+
+  test('Verifica os button de Remover um filtro', async () => {
+    await waitFor(() => render(<App />));
+    const buttonFilter = screen.getByTestId("button-filter");
+
+    await waitFor(() => {
+      userEvent.click(buttonFilter);
+    });
+    const removeFilter = screen.getByTestId('remove-filter');
+
+    userEvent.click(removeFilter);
+  });
 });

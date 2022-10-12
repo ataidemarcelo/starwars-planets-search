@@ -151,6 +151,7 @@ function App() {
               {filter.number}
             </span>
             <button
+              data-testid="remove-filter"
               onClick={ () => {
                 const newSelectedFilters = selectedFilters.filter(
                   (item) => (item.column !== filter.column),
