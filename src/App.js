@@ -128,17 +128,44 @@ function App() {
         >
           FILTRAR
         </button>
+        <button
+          type="button"
+          data-testid="button-remove-filters"
+          onClick={ () => setSelectedFilters([]) }
+        >
+          REMOVER FILTROS
+        </button>
       </form>
 
       <div>
-        {selectedFilters.map((filter, index) => (
-          <p key={ index }>
-            {filter.column}
-            {' '}
-            {filter.operator}
-            {' '}
-            {filter.number}
-          </p>
+        {selectedFilters.map((filter) => (
+          <div
+            data-testid="filter"
+            key={ filter.column }
+          >
+            <span>
+              {filter.column}
+              {' '}
+              {filter.operator}
+              {' '}
+              {filter.number}
+            </span>
+            <button
+              onClick={ () => {
+                const newSelectedFilters = selectedFilters.filter(
+                  (item) => (item.column !== filter.column),
+                );
+                setSelectedFilters(newSelectedFilters);
+                const newsColumnsOptions = [filter.column, ...columnsOptions];
+                setColumnsOptions(newsColumnsOptions);
+                const newComparisonsOptions = [filter.operator, ...comparisonsOptions];
+                setComparisonsOptions(newComparisonsOptions);
+              } }
+              type="button"
+            >
+              X
+            </button>
+          </div>
         ))}
       </div>
 
